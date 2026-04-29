@@ -407,10 +407,11 @@ all_modelling_nuts <- function(model_data,n_mcmc = 3000,
 }
 
 obs_list <- c(5,10,30,50,100)
-d_list <- c(30,50)#2,5,10)#,
+d_list_low <- c(2,5,10)
+d_list_high <- c(30,50)
 dof_list <- c(3,6,11,31,51,101)
 
-write_xlsx(data.frame(),"simulated_experiments_results_time_iter.xlsx")
+#write_xlsx(data.frame(),"simulated_experiments_results_time_iter.xlsx")
 
 
 experiments_def <- function(obs, d_list,dof_list){
@@ -422,7 +423,7 @@ experiments_def <- function(obs, d_list,dof_list){
   counter <- 1
   for (d in d_list[d_list<=obs]){
     for (dof in dof_list[dof_list>d]){
-      for (iter in 1:10){
+      for (iter in 1:2){
         A <- matrix(runif(d^2,-10,10), ncol=d) 
         Sigma <- t(A) %*% A
         upper_sigma <- Sigma[upper.tri(Sigma, diag = T)]
@@ -517,47 +518,47 @@ experiments_def <- function(obs, d_list,dof_list){
         
       }
     }
-    df_all_append <- read_excel("simulated_experiments_results_time_iter.xlsx")
-    df_all_save <- do.call("rbind", df_all_list)
-    df_all_append <- rbind(df_all_append,df_all_save)
-    df_all_append <- df_all_append[!duplicated(df_all_append), ]
-    write_xlsx(df_all_append,"simulated_experiments_results_time_iter.xlsx")
+    # df_all_append <- read_excel("simulated_experiments_results_time_iter.xlsx")
+    # df_all_save <- do.call("rbind", df_all_list)
+    # df_all_append <- rbind(df_all_append,df_all_save)
+    # df_all_append <- df_all_append[!duplicated(df_all_append), ]
+    # write_xlsx(df_all_append,"simulated_experiments_results_time_iter.xlsx")
   }
   df_all <- do.call("rbind", df_all_list)
   
   return(df_all)
 }
 
-#example_df = experiments_def(100,10,15)
-#example_df
+example_df = experiments_def(20,5,15)
+example_df
 
-detectCores()
-cl <- makeCluster(5,
-                  outfile="log.txt")
-clusterExport(cl,
-              list("sum_det_list","log_v_estimation","degrees_of_freedom",
-                   "v_estimation","bisection_method",
-                   "second_derivative","NR_wishart",
-                   "n_pdf","metropolis_within_gibbs",
-                   "read_excel","write_xlsx","abind",
-                   "rInvWishart","lmvgamma","RWM_for_dof",
-                   "slice_sample","n_pdf_gradient","HMC",
-                   "all_modelling_nuts","stan_model_unif",
-                   "stan_model_exp","stan_model_gamma",
-                   "stan_model_invgamma","stan_model_lognormal",
-                   "effectiveSize","geweke.diag","sampling","extract","withTimeout"),
-              envir=globalenv())
-
-
-
-system.time({saves <- parLapply(cl, obs_list,
-                                experiments_def,
-                                d_list = d_list,
-                                dof_list = dof_list)})
-
-stopCluster(cl)
-
-df_all_experiments <- do.call("rbind", saves)
-
-
-write_xlsx(df_all_experiments,"simulated_experiments_results_time.xlsx")
+# detectCores()
+# cl <- makeCluster(5,
+#                   outfile="log.txt")
+# clusterExport(cl,
+#               list("sum_det_list","log_v_estimation","degrees_of_freedom",
+#                    "v_estimation","bisection_method",
+#                    "second_derivative","NR_wishart",
+#                    "n_pdf","metropolis_within_gibbs",
+#                    "read_excel","write_xlsx","abind",
+#                    "rInvWishart","lmvgamma","RWM_for_dof",
+#                    "slice_sample","n_pdf_gradient","HMC",
+#                    "all_modelling_nuts","stan_model_unif",
+#                    "stan_model_exp","stan_model_gamma",
+#                    "stan_model_invgamma","stan_model_lognormal",
+#                    "effectiveSize","geweke.diag","sampling","extract","withTimeout"),
+#               envir=globalenv())
+# 
+# 
+# 
+# system.time({saves <- parLapply(cl, obs_list,
+#                                 experiments_def,
+#                                 d_list = d_list,
+#                                 dof_list = dof_list)})
+# 
+# stopCluster(cl)
+# 
+# df_all_experiments <- do.call("rbind", saves)
+# 
+# 
+# write_xlsx(df_all_experiments,"simulated_experiments_results_time.xlsx")

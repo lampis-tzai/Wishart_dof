@@ -439,8 +439,6 @@ for (team in unique(basketball$Tm)){
   i = i+1
 }
 
-#model_data_list = basketball_model_data
-
 basketball_results = all_methods(basketball_model_data,d=(ncol(basketball)-1))
 basketball_results
 
@@ -463,14 +461,8 @@ air = as.data.frame(read.csv('real_datasets/AQI and Lat Long of Countries.csv',
 
 air = air[, (names(air) %in% c('Country','AQI.Value','Ozone.AQI.Value'))]
 
-#model=kmeans(air[,2:3],20)
-#library(cluster)
-#clusplot(air[,2:3],model$cluster)
-#air['cluster'] = model$cluster
 
-#air_cluster = air[air$cluster==2,]
-
-
+#alps countries
 air_alps = air[air$Country %in% c("Italy" ,"France","Switzerland" ,"Austria", "Germany","Slovenia"),]
 
 air_model_data = list()
@@ -482,7 +474,6 @@ for (my in unique(air_alps$Country)){
   }
 }
 
-#model_data_list = air_model_data
 
 air_results = all_methods(air_model_data,d=2)
 air_results
@@ -499,10 +490,7 @@ for(i in 1:5){
 
 
 
-#### hand data
-
 hand_data <- as.data.frame(read_excel("real_datasets/adoq_data_all_fourier_pred.xlsx"))
-#hand_data = hand_data[hand_data$character %in% c('a','o'),]
 hand_data['new_id'] = paste0(hand_data$Writer,'_',hand_data$Lettre)
 
 hand_model_data = list()
@@ -516,7 +504,6 @@ for (t in unique(hand_data$new_id)){
   }
 }
 
-#model_data_list = hand_model_data
 
 hand_results = all_methods(hand_model_data,d=20)
 hand_results

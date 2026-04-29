@@ -358,7 +358,7 @@ obs_list <- c(5,10,30,50,100)
 d_list <- c(2,5,10,30,50)
 dof_list <- c(3,6,11,31,51,101)
 
-write_xlsx(data.frame(),"simulated_experiments_results_iter.xlsx")
+#write_xlsx(data.frame(),"simulated_experiments_results_iter.xlsx")
 
 
 experiments_def <- function(obs, d_list,dof_list){
@@ -475,48 +475,48 @@ experiments_def <- function(obs, d_list,dof_list){
         
       }
     }
-    print(df_all_iter)
-    df_all_append <- read_excel("simulated_experiments_results_iter.xlsx")
-    df_all_save <- do.call("rbind", df_all_list)
-    df_all_append <- rbind(df_all_append,df_all_save)
-    df_all_append <- df_all_append[!duplicated(df_all_append), ]
-    write_xlsx(df_all_append,"simulated_experiments_results_iter.xlsx")
+    # print(df_all_iter)
+    # df_all_append <- read_excel("simulated_experiments_results_iter.xlsx")
+    # df_all_save <- do.call("rbind", df_all_list)
+    # df_all_append <- rbind(df_all_append,df_all_save)
+    # df_all_append <- df_all_append[!duplicated(df_all_append), ]
+    # write_xlsx(df_all_append,"simulated_experiments_results_iter.xlsx")
   }
   df_all <- do.call("rbind", df_all_list)
   
   return(df_all)
 }
 
-#example_df = experiments_def(20,5,15)
-#example_df
+example_df = experiments_def(20,5,15)
+example_df
 
-detectCores()
-cl <- makeCluster(5,
-                  outfile="log.txt")
-clusterExport(cl,
-              list("sum_det_list","log_v_estimation","degrees_of_freedom",
-                   "v_estimation","bisection_method",
-                   "second_derivative","NR_wishart",
-                   "n_pdf","metropolis_within_gibbs",
-                   "read_excel","write_xlsx","abind",
-                   "rInvWishart","lmvgamma","RWM_for_dof",
-                   "slice_sample","n_pdf_gradient","HMC",
-                   "all_modelling_nuts","stan_model_unif",
-                   "stan_model_exp","stan_model_gamma",
-                   "stan_model_invgamma","stan_model_lognormal",
-                   "effectiveSize","geweke.diag","sampling","extract","withTimeout"),
-              envir=globalenv())
-
-
-
-system.time({saves <- parLapply(cl, obs_list,
-                                experiments_def,
-                                d_list = d_list,
-                                dof_list = dof_list)})
-
-stopCluster(cl)
-
-df_all_experiments <- do.call("rbind", saves)
-
-
-write_xlsx(df_all_experiments,"simulated_experiments_results.xlsx")
+# detectCores()
+# cl <- makeCluster(5,
+#                   outfile="log.txt")
+# clusterExport(cl,
+#               list("sum_det_list","log_v_estimation","degrees_of_freedom",
+#                    "v_estimation","bisection_method",
+#                    "second_derivative","NR_wishart",
+#                    "n_pdf","metropolis_within_gibbs",
+#                    "read_excel","write_xlsx","abind",
+#                    "rInvWishart","lmvgamma","RWM_for_dof",
+#                    "slice_sample","n_pdf_gradient","HMC",
+#                    "all_modelling_nuts","stan_model_unif",
+#                    "stan_model_exp","stan_model_gamma",
+#                    "stan_model_invgamma","stan_model_lognormal",
+#                    "effectiveSize","geweke.diag","sampling","extract","withTimeout"),
+#               envir=globalenv())
+# 
+# 
+# 
+# system.time({saves <- parLapply(cl, obs_list,
+#                                 experiments_def,
+#                                 d_list = d_list,
+#                                 dof_list = dof_list)})
+# 
+# stopCluster(cl)
+# 
+# df_all_experiments <- do.call("rbind", saves)
+# 
+# 
+# write_xlsx(df_all_experiments,"simulated_experiments_results.xlsx")

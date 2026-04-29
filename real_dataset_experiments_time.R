@@ -510,8 +510,6 @@ for (team in unique(basketball$Tm)){
   i = i+1
 }
 
-#model_data_list = basketball_model_data
-
 basketball_results = all_methods(basketball_model_data,d=(ncol(basketball)-1))
 basketball_results
 
@@ -534,14 +532,7 @@ air = as.data.frame(read.csv('real_datasets/AQI and Lat Long of Countries.csv',
 
 air = air[, (names(air) %in% c('Country','AQI.Value','Ozone.AQI.Value'))]
 
-#model=kmeans(air[,2:3],20)
-#library(cluster)
-#clusplot(air[,2:3],model$cluster)
-#air['cluster'] = model$cluster
-
-#air_cluster = air[air$cluster==2,]
-
-
+#alps countries
 air_alps = air[air$Country %in% c("Italy" ,"France","Switzerland" ,"Austria", "Germany","Slovenia"),]
 
 air_model_data = list()
@@ -552,8 +543,6 @@ for (my in unique(air_alps$Country)){
     i=i+1
   }
 }
-
-#model_data_list = air_model_data
 
 air_results = all_methods(air_model_data,d=2)
 air_results
@@ -573,7 +562,6 @@ for(i in 1:5){
 #### hand data
 
 hand_data <- as.data.frame(read_excel("real_datasets/adoq_data_all_fourier_pred.xlsx"))
-#hand_data = hand_data[hand_data$character %in% c('a','o'),]
 hand_data['new_id'] = paste0(hand_data$Writer,'_',hand_data$Lettre)
 
 hand_model_data = list()
@@ -586,8 +574,6 @@ for (t in unique(hand_data$new_id)){
     i=i+1
   }
 }
-
-#model_data_list = hand_model_data
 
 hand_results = all_methods(hand_model_data,d=20)
 hand_results
@@ -710,87 +696,3 @@ plot_V_3d <- hist3D(z=z, border="black", main = "3D histogram of the eigenvalues
                     xlab = "Largest eigenvalue", ylab = "Smalest eigenvalue",
                     zlab = "Frequency")
 dev.off()
-
-
-
-####### Comparisons with fixed degrees of freedom ##########
- 
-##################### PLOTs ##########################
-fixed_degrees_of_freedom <- function(model_data,n_samples=2000){
-  sum_xi = 0
-  for (md in model_data){
-    sum_xi = sum_xi + md
-  }
-  
-  M = length(model_data)
-  p = dim(model_data[[1]])[1]
-  
-  m = p
-  U = diag(0.0001,p)
-  
-  n_fixed<-p+2
-  
-  V_post = list()
-  
-  for (i in 1:n_samples){
-    V_post[[i]] = rInvWishart(1,((n_fixed*M) + m),(sum_xi + U))[,,1]
-  }
-  
-  return(V_post)
-}
-
-
-
-post_samples <- all_methods(basketball_model_data, d=7, return_samples = 'HMC')
-
-V_post = post_samples[[2]]
-library(plot3D)
-
-get_eigen <- function(V) {
-  biggest <- sapply(V, function(x) max(eigen(x)$values))
-  smallest <- sapply(V, function(x) min(eigen(x)$values))
-  list(biggest = biggest, smallest = smallest)
-}
-
-eigen1 <- get_eigen(V_post)
-V_post_fixed = fixed_degrees_of_freedom(basketball_model_data)
-eigen2 <- get_eigen(V_post_fixed)
-
-# Use the same breaks for both datasets for comparison
-breaks_biggest <- seq(min(c(eigen1$biggest, eigen2$biggest)), 
-                      max(c(eigen1$biggest, eigen2$biggest)), length.out = 21)
-breaks_smallest <- seq(min(c(eigen1$smallest, eigen2$smallest)), 
-                       max(c(eigen1$smallest, eigen2$smallest)), length.out = 21)
-
-# Cut and table for first dataset
-biggest_cut1 <- cut(eigen1$biggest, breaks = breaks_biggest)
-smallest_cut1 <- cut(eigen1$smallest, breaks = breaks_smallest)
-z1 <- table(biggest_cut1, smallest_cut1)
-
-# Cut and table for second dataset
-biggest_cut2 <- cut(eigen2$biggest, breaks = breaks_biggest)
-smallest_cut2 <- cut(eigen2$smallest, breaks = breaks_smallest)
-z2 <- table(biggest_cut2, smallest_cut2)
-
-
-
-library(plot3D)
-
-# Prepare x and y midpoints for plotting
-x <- (breaks_biggest[-1] + breaks_biggest[-length(breaks_biggest)]) / 2
-y <- (breaks_smallest[-1] + breaks_smallest[-length(breaks_smallest)]) / 2
-
-# Plot the first histogram (color 1)
-hist3D(x = x, y = y, z = z1, border = "black", col = "lightblue", alpha = 0.7,
-       main = "3D Histogram of Eigenvalues for Two V_post Sets",
-       xlab = "Largest eigenvalue", ylab = "Smallest eigenvalue", zlab = "Frequency")
-
-# Add the second histogram (color 2)
-hist3D(x = x, y = y, z = z2, border = "black", col = "salmon", alpha = 0.7, add = TRUE)
-
-
-legend("topright", legend = c("V_post_modelling", "V_post_fixed"), fill = c("lightblue", "salmon"))
-
-
-
-
