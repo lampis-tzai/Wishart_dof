@@ -561,7 +561,7 @@ for(i in 1:5){
 
 #### hand data
 
-hand_data <- as.data.frame(read_excel("real_datasets/adoq_data_all_fourier_pred.xlsx"))
+hand_data <- as.data.frame(read_excel("real_datasets/handwriting_data_bootstrap.xlsx"))
 hand_data['new_id'] = paste0(hand_data$Writer,'_',hand_data$Lettre)
 
 hand_model_data = list()
