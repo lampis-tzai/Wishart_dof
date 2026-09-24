@@ -163,7 +163,7 @@ run_real_dataset <- function(
 
 basketball <- as.data.frame(
   read.csv(
-    "../real_datasets/2022-2023 NBA Player Stats - Regular.csv",
+    "real_datasets/2022-2023 NBA Player Stats - Regular.csv",
     header = TRUE,
     sep = ";"
   )
@@ -206,7 +206,7 @@ for (team in unique(basketball$Tm)) {
 
 air <- as.data.frame(
   read.csv(
-    "../real_datasets/AQI and Lat Long of Countries.csv",
+    "real_datasets/AQI and Lat Long of Countries.csv",
     header = TRUE,
     sep = ","
   )
@@ -265,7 +265,7 @@ library(readxl)
 
 hand_data <- as.data.frame(
   read_excel(
-    "../real_datasets/DB_loop_handwriting_ls.xlsx"
+    "real_datasets/DB_loop_handwriting_ls.xlsx"
   )
 )
 
