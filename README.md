@@ -17,7 +17,15 @@ GitHub structure:
 
 Folders:
 
+* Simulation_experiments/: Contains the results for the simulation study.
+* plots/: Contains the plots reported in the paper.
+* real_datasets/: Contains the real datasets used in the paper.
+
 Files:
+
+* real_data_applications.R: Contains the code for Bayesian inference of the Wishart degrees of freedom and scale matrix for the real datasets.
+* wishart_df_methods.R: Contains the implementations of the collapsed method, the Random-Walk Metropolis within Gibbs algorithm, and maximum likelihood estimation.
+* wishart_df_simulations_parallel.R: Contains the code for the simulation study presented in the paper.
 
 
 
