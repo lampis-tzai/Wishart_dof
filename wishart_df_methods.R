@@ -9,10 +9,7 @@
 #   2. Random-Walk Metropolis within Gibbs (RWM)
 #   3. Collapsed Bayesian inference
 #
-# All three top-level fitting functions return estimates of BOTH
-# the degrees of freedom n and the scale matrix V.
 #
-# Dependencies: base R only
 # ============================================================
 
 # -----------------------------
@@ -345,7 +342,7 @@ fit_rwm <- function(X,
                     iter = 4000,
                     burn = 1000,
                     delta = NULL,
-                    prior_upper = 1e4,
+                    prior_upper = 1e3,
                     init_n = NULL,
                     seed = NULL) {
 
@@ -440,7 +437,7 @@ fit_rwm <- function(X,
 log_collapsed_posterior_n <- function(n, prep,
                                       n_v = NULL,
                                       U = NULL,
-                                      prior_upper = 1e4) {
+                                      prior_upper = 1e3) {
 
   p <- prep$p
   m <- prep$m
@@ -544,7 +541,7 @@ make_collapsed_grid <- function(prep,
 fit_collapsed <- function(X,
                           n_v = NULL,
                           U = NULL,
-                          prior_upper = 1e4,
+                          prior_upper = 1e3,
                           grid_size = 1500,
                           n_draws = 0,
                           seed = NULL) {
