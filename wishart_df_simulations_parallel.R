@@ -633,7 +633,7 @@ cat("Simulation completed successfully.\n")
 # The CSV files contain the complete scenario-level results.
 # ============================================================
 
-results <- read.csv("wishart_df_simulation_results.csv")
+results <- read.csv("Simulation_experiments/wishart_df_simulation_results.csv")
 
 plot_data <- aggregate(
   cbind(
@@ -730,7 +730,7 @@ make_panel_plot <- function(
       ylim <- range(y)
       
       ## Add some space
-      ylim <- ylim * c(0.85, 1.15)
+      ylim <- ylim * c(0.85, 1.5)
       
     } else {
       
@@ -865,20 +865,20 @@ make_panel_plot <- function(
     ## Legend only once
     ## ----------------------------
     
-    if (ratio_value == max(n_ratios)) {
-      
-      legend(
-        "topright",
-        legend = methods,
-        col = method_col,
-        pch = method_pch,
-        lty = method_lty,
-        lwd = method_lwd,
-        pt.cex = 1.0,
-        bty = "n",
-        cex = 0.95
-      )
-    }
+    #if (ratio_value == max(n_ratios)) {
+    #  
+     legend(
+       "topright",
+       legend = methods,
+       col = method_col,
+      pch = method_pch,
+       lty = method_lty,
+       lwd = method_lwd,
+       pt.cex = 1.0,
+       bty = "n",
+       cex = 0.95
+     )
+    #}
   }
   
   ## Overall title
@@ -970,7 +970,7 @@ cat("  ", output_runtime_plot, "\n")
 
 library(dplyr)
 
-results <- read.csv("wishart_df_simulation_results.csv")
+results <- read.csv("Simulation_experiments/wishart_df_simulation_results.csv")
 
 general_result <- results %>%
   group_by(method) %>%

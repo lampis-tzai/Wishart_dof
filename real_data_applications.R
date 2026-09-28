@@ -8,7 +8,6 @@
 #
 # The collapsed Bayesian method is the primary method.
 # The posterior mode is the primary point estimate for n.
-# The posterior mean is reported as an additional summary.
 # The posterior mean is used for V.
 #
 # Required file:
@@ -688,7 +687,7 @@ plot_V_eigenvalues <- function(
     lwd = 0.6,
     
     main = paste0(
-      "Posterior distribution of extreme eigenvalues of V\n",
+      "Posterior distribution of the eigenvalues of V\n",
       dataset_title
     ),
     
