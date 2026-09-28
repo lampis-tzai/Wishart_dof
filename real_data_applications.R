@@ -29,12 +29,12 @@ library(dplyr)
 # ============================================================
 
 prior_upper <- 1e3
-grid_size <- 3000
+grid_size <- 20000
 n_draws_V <- 5000
 
 # RWM settings for the reported application table
 rwm_iter <- 10000
-rwm_burn <- 3000
+rwm_burn <- 4000
 
 U_scale <- 1e-4
 

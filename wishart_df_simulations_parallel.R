@@ -12,7 +12,7 @@ source("wishart_df_methods.R")
 # CONFIG
 # ============================================================
 
-n_cores <- max(1L, parallel::detectCores() - 1L)
+n_cores <- 10
 
 cat("Using", n_cores, "parallel cores.\n")
 
@@ -25,14 +25,14 @@ m_values <- c(10, 20, 50, 100, 200)
 # Use 3 for a test run; change to 1000 for the final run.
 R_main <- 1000
 
-rwm_iter <- 4000
-rwm_burn <- 1000
+rwm_iter <- 10000
+rwm_burn <- 4000
 
 prior_upper <- 1e3
 n_v <- NULL
 U_scale <- 1e-4
 
-collapsed_grid_size <- 1500
+collapsed_grid_size <- 20000
 
 output_results <- "wishart_df_simulation_results.csv"
 output_raw <- "wishart_df_simulation_replications.csv"
