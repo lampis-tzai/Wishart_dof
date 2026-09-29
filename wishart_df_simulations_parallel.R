@@ -730,7 +730,7 @@ make_panel_plot <- function(
       ylim <- range(y)
       
       ## Add some space
-      ylim <- ylim * c(0.85, 1.5)
+      ylim <- ylim * c(0.85, 2)
       
     } else {
       
