@@ -479,8 +479,8 @@ summarize_mcmc_n <- function(draws) {
 
 fit_rwm <- function(
     X,
-    iter = 4000,
-    burn = 1000,
+    iter = 10000,
+    burn = 4000,
     delta = 2,
     prior_upper = 1e3,
     init_n = NULL,
@@ -579,23 +579,119 @@ fit_rwm <- function(
 
   V_mean <- (V_mean + t(V_mean)) / 2
 
+  # ----------------------------------------------------------
+  # Effective sample size for n
+  #
+  # ESS = N / (1 + 2 * sum rho_k)
+  #
+  # We sum autocorrelations until the first non-positive value.
+  # ----------------------------------------------------------
+  
+  N_post <- length(n_post)
+  
+  if (N_post < 2) {
+    
+    n_ess <- NA_real_
+    
+  } else {
+    
+    acf_values <- stats::acf(
+      n_post,
+      lag.max = N_post - 1,
+      plot = FALSE
+    )$acf
+    
+    rho <- as.numeric(
+      acf_values[-1]
+    )
+    
+    # Keep autocorrelations up to the first non-positive value.
+    first_nonpositive <- which(
+      rho <= 0
+    )[1]
+    
+    if (is.na(first_nonpositive)) {
+      
+      rho_positive <- rho
+      
+    } else if (first_nonpositive == 1) {
+      
+      rho_positive <- numeric(0)
+      
+    } else {
+      
+      rho_positive <-
+        rho[seq_len(first_nonpositive - 1)]
+    }
+    
+    tau <- 1 + 2 * sum(
+      rho_positive
+    )
+    
+    n_ess <- N_post / tau
+    
+    # Numerical protection.
+    n_ess <- min(
+      max(n_ess, 1),
+      N_post
+    )
+  }
+  
+  # ----------------------------------------------------------
+  # Runtime
+  # ----------------------------------------------------------
+  
+  acceptance_rate <-
+    accepted / (iter - 1)
+  
+  # ----------------------------------------------------------
+  # Return
+  # ----------------------------------------------------------
+  
   list(
     method = "RWM",
-    n = summarize_mcmc_n(n_post),
+    
+    n = summarize_mcmc_n(
+      n_post
+    ),
+    
     V = list(
       estimate = V_mean,
       mean = V_mean,
       draws = dim(V_post)[3]
     ),
+    
     n_draws = n_post,
+    
     V_draws = V_post,
+    
     runtime = runtime,
+    
     diagnostics = list(
-      acceptance_rate = accepted / (iter - 1),
-      iter = iter,
-      burn = burn,
-      delta = delta,
-      init_n = init_n
+      
+      acceptance_rate =
+        acceptance_rate,
+      
+      effective_sample_size =
+        n_ess,
+      
+      ess_fraction =
+        n_ess / N_post,
+      
+      post_burn_in_draws =
+        N_post,
+      
+      iter =
+        iter,
+      
+      burn =
+        burn,
+      
+      delta =
+        delta,
+      
+      init_n =
+        init_n
     )
   )
 }

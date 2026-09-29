@@ -771,3 +771,268 @@ print(
   real_data_results_report
 )
 
+
+
+
+
+
+# ============================================================
+# Sensitivity analysis for the real-data applications
+#
+# Two sensitivity analyses:
+#   1. Upper bound of Uniform prior for n
+#   2. Scale of inverse-Wishart prior for V
+#
+# The collapsed Bayesian method is used because the purpose
+# is to assess sensitivity to the prior specification.
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Sensitivity settings
+# ------------------------------------------------------------
+
+sensitivity_prior_upper <- c(
+  100,
+  1000,
+  5000
+)
+
+sensitivity_U_scale <- c(
+  1e-5,
+  1e-4,
+  1e-3
+)
+
+# No posterior draws are needed for the sensitivity analysis.
+n_draws_sensitivity <- 0
+
+# Larger grid than the main analysis so that the upper bound
+# of 5000 is not represented by an excessively coarse grid.
+sensitivity_grid_size <- 50000
+
+
+# ============================================================
+# Helper function
+# ============================================================
+
+run_collapsed_sensitivity <- function(
+    model_data,
+    dataset_name,
+    n_v = NULL,
+    prior_upper_values = c(100, 1000, 5000),
+    U_scale_values = c(1e-5, 1e-4, 1e-3),
+    grid_size = 50000) {
+  
+  p <- nrow(model_data[[1]])
+  
+  if (is.null(n_v)) {
+    n_v <- p
+  }
+  
+  results <- list()
+  result_id <- 0L
+  
+  
+  # ==========================================================
+  # 1. Sensitivity to the upper bound of the prior on n
+  # ==========================================================
+  
+  cat("\n============================================================\n")
+  cat(dataset_name, "\n")
+  cat("Sensitivity to prior upper bound\n")
+  cat("============================================================\n")
+  
+  for (prior_upper_value in prior_upper_values) {
+    
+    cat(
+      "  Prior upper bound:",
+      prior_upper_value,
+      "\n"
+    )
+    
+    fit <- fit_collapsed(
+      X = model_data,
+      n_v = n_v,
+      U = diag(
+        U_scale,
+        p
+      ),
+      prior_upper = prior_upper_value,
+      grid_size = grid_size,
+      n_draws = n_draws_sensitivity
+    )
+    
+    result_id <- result_id + 1L
+    
+    results[[result_id]] <- data.frame(
+      dataset = dataset_name,
+      sensitivity = "Prior upper bound",
+      setting = prior_upper_value,
+      prior_upper = prior_upper_value,
+      U_scale = U_scale,
+      
+      n_mode = fit$n$mode,
+      n_mean = fit$n$mean,
+      n_median = fit$n$median,
+      n_sd = fit$n$sd,
+      n_lower_95 = fit$n$lower,
+      n_upper_95 = fit$n$upper,
+      
+      runtime_seconds = fit$runtime,
+      
+      stringsAsFactors = FALSE
+    )
+  }
+  
+  
+  # ==========================================================
+  # 2. Sensitivity to inverse-Wishart scale U
+  # ==========================================================
+  
+  cat("\n============================================================\n")
+  cat(dataset_name, "\n")
+  cat("Sensitivity to inverse-Wishart scale\n")
+  cat("============================================================\n")
+  
+  for (U_scale_value in U_scale_values) {
+    
+    cat(
+      "  U scale:",
+      U_scale_value,
+      "\n"
+    )
+    
+    fit <- fit_collapsed(
+      X = model_data,
+      n_v = n_v,
+      U = diag(
+        U_scale_value,
+        p
+      ),
+      prior_upper = prior_upper,
+      grid_size = grid_size,
+      n_draws = n_draws_sensitivity
+    )
+    
+    result_id <- result_id + 1L
+    
+    results[[result_id]] <- data.frame(
+      dataset = dataset_name,
+      sensitivity = "Inverse-Wishart scale",
+      setting = U_scale_value,
+      prior_upper = prior_upper,
+      U_scale = U_scale_value,
+      
+      n_mode = fit$n$mode,
+      n_mean = fit$n$mean,
+      n_median = fit$n$median,
+      n_sd = fit$n$sd,
+      n_lower_95 = fit$n$lower,
+      n_upper_95 = fit$n$upper,
+      
+      runtime_seconds = fit$runtime,
+      
+      stringsAsFactors = FALSE
+    )
+  }
+  
+  
+  # ==========================================================
+  # Combine
+  # ==========================================================
+  
+  do.call(
+    rbind,
+    results
+  )
+}
+
+
+# ============================================================
+# Run sensitivity analysis
+# ============================================================
+
+nba_sensitivity <- run_collapsed_sensitivity(
+  model_data = basketball_model_data,
+  dataset_name = "NBA 2022--2023",
+  n_v = 7
+)
+
+air_sensitivity <- run_collapsed_sensitivity(
+  model_data = air_model_data,
+  dataset_name = "Alpine air quality",
+  n_v = 2
+)
+
+hand_sensitivity <- run_collapsed_sensitivity(
+  model_data = hand_model_data,
+  dataset_name = "Handwriting",
+  n_v = 9
+)
+
+
+# ============================================================
+# Combine all datasets
+# ============================================================
+
+sensitivity_results <- rbind(
+  nba_sensitivity,
+  air_sensitivity,
+  hand_sensitivity
+)
+
+
+# ============================================================
+# Rounded reporting table
+# ============================================================
+
+sensitivity_results_report <- sensitivity_results
+
+numeric_columns <- c(
+  "setting",
+  "prior_upper",
+  "U_scale",
+  "n_mode",
+  "n_mean",
+  "n_median",
+  "n_sd",
+  "n_lower_95",
+  "n_upper_95",
+  "runtime_seconds"
+)
+
+sensitivity_results_report[
+  numeric_columns
+] <- lapply(
+  sensitivity_results_report[numeric_columns],
+  function(x) round(x, 4)
+)
+
+
+# ============================================================
+# Save results
+# ============================================================
+
+# write.csv(
+#   sensitivity_results,
+#   "real_data_sensitivity_results.csv",
+#   row.names = FALSE
+# )
+# 
+# write.csv(
+#   sensitivity_results_report,
+#   "real_data_sensitivity_results_report.csv",
+#   row.names = FALSE
+# )
+
+
+# ============================================================
+# Display
+# ============================================================
+
+print(
+  sensitivity_results_report,
+  row.names = FALSE
+)
+
